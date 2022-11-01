@@ -1,20 +1,22 @@
-create or replace procedure total_salary
-is
-type arr1 is table of hr.employees.salary%type index by pls_integer;
-type arr2 is table of hr.employees.employee_id%type index by pls_integer;
+create or replace procedure P1 (x date)
+is 
+cursor c_emp is
+select empno , (sal/((last_day(x)-trunc(x,'month')+1)))*(x-trunc(x,'month')) from scott.emp;
 
-workdays_sal arr1;
-v_emp_id arr2;
+v_empno scott.emp.empno%type;
+v_sal scott.emp.sal%type;
 
 begin
-    for i in 100 .. 150 loop
-    select ((sysdate - trunc(sysdate,'month'))*(salary/30)),employee_id into workdays_sal(i),v_emp_id(i)
-    from hr.employees
-    where employee_id =i;
-    
-    dbms_output.put_line(v_emp_id(i)|| q'['s salary deserved is ]' || workdays_sal(i));
-    end loop;
+open c_emp;
+loop
+
+fetch c_emp into v_empno , v_sal;
+
+exit when c_emp %notfound;
+dbms_output.put_line(v_empno || ' ' || v_sal);
+
+end loop;
+close c_emp;
 end;
 
-
-execute total_salary 
+execute P1('17-nov-22');
